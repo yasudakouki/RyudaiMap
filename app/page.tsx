@@ -9,7 +9,8 @@ export default function Home() {
     if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
       throw new Error("NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not set");
     }
-    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN; // アクセストークンをセット
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoieWFzdWRha291a2kiLCJhIjoiY20xaGU4Y2FyMGUzNDJsb2owN2g5MTduMCJ9.xQ6cnl4Snx - RoGPRHTwinw"; // アクセストークンをセット
 
     // マップを初期化
     const map = new mapboxgl.Map({
