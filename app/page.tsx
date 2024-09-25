@@ -13,9 +13,9 @@ export default function Home() {
 
     // マップを初期化
     const map = new mapboxgl.Map({
-      container: "hoge", // マップを表示するdivのID
+      container: "map", // マップを表示するdivのID
       style: "mapbox://styles/mapbox/streets-v11", // マップスタイル
-      center: [139.7670516, 35.6811673], // 地図の中心座標（東京駅）
+      center: [127.766086, 26.249847], // 地図の中心座標（東京駅）
       zoom: 15, // ズームレベル
     });
 
@@ -36,7 +36,7 @@ export default function Home() {
         />
       </Head>
       <div
-        id="hoge"
+        id="map"
         style={{
           height: "100vh",
           width: "100%",
