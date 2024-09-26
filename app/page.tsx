@@ -24,7 +24,7 @@ export default function Home() {
       container: "map", // マップを表示するdivのID
       style: "mapbox://styles/mapbox/streets-v11", // マップスタイル
       center: [127.766086, 26.249847], // 地図の中心座標（東京駅）
-      zoom: 15, // ズームレベル
+      zoom: 15.3, // ズームレベル
     });
 
     console.log(map); // mapオブジェクトの確認
