@@ -20,7 +20,7 @@ export default function Home() {
     });
 
     // GeoJSONデータを使ってカスタムポイントを追加
-    const customPoint = {
+    const customPoint: GeoJSON.FeatureCollection = {
       'type': 'FeatureCollection',
       'features': [
         {
@@ -35,7 +35,7 @@ export default function Home() {
         }
       ]
     };
-
+    
     // スタイルが読み込まれたときにカスタムレイヤーを追加
     map.on('style.load', () => {
       // カスタムポイントのソースを追加
