@@ -15,8 +15,8 @@ export default function Home() {
     const map = new mapboxgl.Map({
       container: "map", // マップを表示するdivのID
       style: "mapbox://styles/mapbox/streets-v11", // マップスタイル
-      center: [139.7670516, 35.6811673], // 地図の中心座標（東京駅）
-      zoom: 15, // ズームレベル
+      center: [127.766308,26.249578], // 琉大の中心座標
+      zoom: 15.3, // ズームレベル
     });
 
     console.log(map); // mapオブジェクトの確認
