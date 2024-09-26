@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import mapboxgl from "mapbox-gl"; // mapbox-glのインポート
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Home() {
+  const [textareaValue, setTextareaValue] = useState(""); // テキストエリアの状態を管理
+
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
       throw new Error("NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not set");
@@ -15,7 +19,7 @@ export default function Home() {
     const map = new mapboxgl.Map({
       container: "map", // マップを表示するdivのID
       style: "mapbox://styles/mapbox/streets-v11", // マップスタイル
-      center: [139.7670516, 35.6811673], // 地図の中心座標（東京駅）
+      center: [127.766086, 26.249847], // 地図の中心座標（東京駅）
       zoom: 15, // ズームレベル
     });
 
@@ -24,6 +28,12 @@ export default function Home() {
     // コンポーネントがアンマウントされたときにマップを削除
     return () => map.remove();
   }, []);
+
+  // ボタンクリック時のハンドラ
+  const handleClick = () => {
+    console.log("ボタンが押されました");
+    console.log("Textareaの内容:", textareaValue); // テキストエリアの内容を出力
+  };
 
   return (
     <>
@@ -38,10 +48,39 @@ export default function Home() {
       <div
         id="map"
         style={{
-          height: "100vh",
+          height: "90vh",
           width: "100%",
+          position: "relative",
         }}
-      ></div>
+      >
+        {/* Textareaをマップの左上に配置 */}
+        <Textarea
+          placeholder="講義検索"
+          value={textareaValue}
+          onChange={(e) => setTextareaValue(e.target.value)} // 入力を状態に反映
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "10px",
+            width: "200px",
+            color: "black",
+            backgroundColor: "white",
+            zIndex: 1, // マップの上に表示されるようにする
+          }}
+        />
+        <Button
+          onClick={handleClick}
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "220px",
+            zIndex: 1,
+            color: "white",
+          }}
+        >
+          検索
+        </Button>
+      </div>
     </>
   );
 }
