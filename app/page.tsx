@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 export default function Home() {
   const [textareaValue, setTextareaValue] = useState(""); // テキストエリアの状態を管理
   const [roomInfo, setRoomInfo] = useState(""); // 講義室情報を管理する状態
-  const [map, setMap] = useState(null); // マップの状態を管理
+  const [map, setMap] = useState<mapboxgl.Map | null>(null); // mapboxgl.Map型またはnull型
   const [marker, setMarker] = useState(null); // マーカーを管理
 
   // 講義名と教室名、座標を保存するMap変数
