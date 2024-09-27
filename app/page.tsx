@@ -11,7 +11,7 @@ export default function Home() {
   const [textareaValue, setTextareaValue] = useState(""); // テキストエリアの状態を管理
   const [roomInfo, setRoomInfo] = useState(""); // 講義室情報を管理する状態
   const [map, setMap] = useState<mapboxgl.Map | null>(null); // mapboxgl.Map型またはnull型
-  const [marker, setMarker] = useState(null); // マーカーを管理
+  const [marker, setMarker] = useState<mapboxgl.Marker | null>(null); // マーカーを管理
 
   // 講義名と教室名、座標を保存するMap変数
   const classInfoMap = new Map([
@@ -104,12 +104,12 @@ export default function Home() {
       // 新しいマーカーを作成して追加
       const newMarker = new mapboxgl.Marker()
         .setLngLat(room.coordinates) // 座標を設定
-        .addTo(map); // マップに追加
+        .addTo(map!); // マップに追加
 
       setMarker(newMarker); // 新しいマーカーを状態に保存
 
       // マップの中心をマーカーの位置に移動
-      map.flyTo({ center: room.coordinates, zoom: 16 });
+      map!.flyTo({ center: room.coordinates, zoom: 16 });
     } else {
       setRoomInfo("講義室が見つかりませんでした。"); // 講義室が見つからなかった場合のメッセージ
     }
