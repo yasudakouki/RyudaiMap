@@ -103,13 +103,13 @@ export default function Home() {
 
       // 新しいマーカーを作成して追加
       const newMarker = new mapboxgl.Marker()
-        .setLngLat(room.coordinates) // 座標を設定
+        .setLngLat(room.coordinates as [number, number]) // 座標を設定
         .addTo(map!); // マップに追加
 
       setMarker(newMarker); // 新しいマーカーを状態に保存
 
       // マップの中心をマーカーの位置に移動
-      map!.flyTo({ center: room.coordinates, zoom: 16 });
+      map!.flyTo({ center: room.coordinates as [number, number], zoom: 16 });
     } else {
       setRoomInfo("講義室が見つかりませんでした。"); // 講義室が見つからなかった場合のメッセージ
     }
