@@ -1,6 +1,6 @@
 "use client";
 
-import 'mapbox-gl/dist/mapbox-gl.css'
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import mapboxgl from "mapbox-gl"; // mapbox-glのインポート
@@ -12,6 +12,7 @@ export default function Home() {
   const [roomInfo, setRoomInfo] = useState(""); // 講義室情報を管理する状態
   const [map, setMap] = useState<mapboxgl.Map | null>(null); // mapboxgl.Map型またはnull型
   const [marker, setMarker] = useState<mapboxgl.Marker | null>(null); // マーカーを管理
+  const [suggestions, setSuggestions] = useState<string[]>([]); // サジェストの候補リスト
 
   // 講義名と教室名、座標を保存するMap変数
   const classInfoMap = new Map([
@@ -42,53 +43,71 @@ export default function Home() {
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [127.764780, 26.252861] // 琉大北口の座標
+            coordinates: [127.764780, 26.252861], // 琉大北口の座標
           },
           properties: {
-            name: '琉大北口'
-          }
+            name: '琉大北口',
+          },
         },
         {
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [127.76586765027561, 26.253177640375156] // 地域創生総合研究棟の座標
+            coordinates: [127.76586765027561, 26.253177640375156], // 地域創生総合研究棟の座標
           },
           properties: {
-            name: '地域創生総合研究棟'
-          }
-        }
-      ]
+            name: '地域創生総合研究棟',
+          },
+        },
+      ],
     };
 
     // スタイルが読み込まれたときにカスタムレイヤーを追加
-    initMap.on('style.load', () => {
+    initMap.on("style.load", () => {
       // カスタムポイントのソースを追加
-      initMap.addSource('custom-point', {
-        type: 'geojson',
-        data: customPoint
+      initMap.addSource("custom-point", {
+        type: "geojson",
+        data: customPoint,
       });
 
       // ラベルを追加するレイヤー
       initMap.addLayer({
-        id: 'custom-point-layer',
-        type: 'symbol',
-        source: 'custom-point',
+        id: "custom-point-layer",
+        type: "symbol",
+        source: "custom-point",
         layout: {
-          'text-field': ['get', 'name'], // propertiesからラベルのテキストを取得
-          'text-size': 16, // テキストサイズ
-          'text-offset': [0, 1.25], // テキスト位置のオフセット
-          'text-anchor': 'top' // テキストのアンカー位置
+          "text-field": ["get", "name"], // propertiesからラベルのテキストを取得
+          "text-size": 16, // テキストサイズ
+          "text-offset": [0, 1.25], // テキスト位置のオフセット
+          "text-anchor": "top", // テキストのアンカー位置
         },
         paint: {
-          'text-color': '#000000' // テキストの色を指定
-        }
+          "text-color": "#000000", // テキストの色を指定
+        },
       });
     });
 
     // コンポーネントがアンマウントされたときにマップを削除
     return () => initMap.remove();
   }, []);
+
+  // テキストエリアの入力に応じてサジェストを表示
+  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = event.target.value;
+    setTextareaValue(value);
+
+    // 入力に応じてサジェストを更新
+    const newSuggestions = Array.from(classInfoMap.keys()).filter((key) =>
+      key.includes(value)
+    );
+    setSuggestions(newSuggestions);
+  };
+
+  // 候補をクリックしたときの処理
+  const handleSuggestionClick = (suggestion: string) => {
+    setTextareaValue(suggestion); // 選択された候補をテキストエリアに反映
+    setSuggestions([]); // サジェストをクリア
+  };
 
   // ボタンクリック時のハンドラ
   const handleClick = () => {
@@ -140,7 +159,7 @@ export default function Home() {
         <Textarea
           placeholder="講義検索"
           value={textareaValue}
-          onChange={(e) => setTextareaValue(e.target.value)}
+          onChange={handleInputChange}
           style={{
             position: "absolute",
             top: "10px",
@@ -152,6 +171,37 @@ export default function Home() {
             resize: "none", // サイズ変更を無効化
           }}
         />
+
+        {/* サジェストの候補を表示 */}
+        {suggestions.length > 0 && (
+          <div
+            style={{
+              position: "absolute",
+              top: "40px",
+              left: "10px",
+              backgroundColor: "white",
+              border: "1px solid #ccc",
+              zIndex: 2,
+              width: "200px",
+              maxHeight: "200px",
+              overflowY: "auto",
+            }}
+          >
+            {suggestions.map((suggestion) => (
+              <div
+                key={suggestion}
+                onClick={() => handleSuggestionClick(suggestion)}
+                style={{
+                  padding: "5px",
+                  cursor: "pointer",
+                  borderBottom: "1px solid #eee",
+                }}
+              >
+                {suggestion}
+              </div>
+            ))}
+          </div>
+        )}
 
         <Button
           onClick={handleClick}
@@ -167,7 +217,7 @@ export default function Home() {
         </Button>
 
         {/* 講義室情報を表示するための要素 */}
-        {roomInfo && ( // roomInfoが空でない場合のみ表示
+        {roomInfo && (
           <div
             style={{
               position: "absolute",
@@ -175,7 +225,7 @@ export default function Home() {
               left: "10px",
               zIndex: 1,
               color: "black",
-              backgroundColor: "white", // 背景を白にする
+              backgroundColor: "white",
               padding: "10px",
               borderRadius: "5px",
               boxShadow: "0 2px 4px rgba(0,0,0,0.2)", // 影を追加
@@ -185,9 +235,7 @@ export default function Home() {
           </div>
         )}
       </div>
-      <div>
-        琉大マップだよー!
-      </div>
+      <div>琉大マップだよー!</div>
     </>
   );
 }
