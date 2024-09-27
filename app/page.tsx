@@ -1,5 +1,6 @@
 "use client";
 
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import mapboxgl from "mapbox-gl"; // mapbox-glのインポート
@@ -9,9 +10,13 @@ import { Textarea } from "@/components/ui/textarea";
 export default function Home() {
   const [textareaValue, setTextareaValue] = useState(""); // テキストエリアの状態を管理
   const [roomInfo, setRoomInfo] = useState(""); // 講義室情報を管理する状態
+  const [map, setMap] = useState(null); // マップの状態を管理
+  const [marker, setMarker] = useState(null); // マーカーを管理
 
-  // 講義名と教室名を保存するMap変数
-  const classInfoMap = new Map([["情報技術演習Ⅰ", "地創棟508"]]);
+  // 講義名と教室名、座標を保存するMap変数
+  const classInfoMap = new Map([
+    ["情報技術演習Ⅰ", { name: "地創棟508", coordinates: [127.76586765027561, 26.253177640375156] }]
+  ]);
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
@@ -20,12 +25,14 @@ export default function Home() {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
     // マップを初期化
-    const map = new mapboxgl.Map({
+    const initMap = new mapboxgl.Map({
       container: "map", // マップを表示するdivのID
       style: "mapbox://styles/mapbox/streets-v11", // マップスタイル
       center: [127.766308, 26.249578], // 琉大の中心座標
       zoom: 15.3, // ズームレベル
     });
+
+    setMap(initMap); // マップオブジェクトを状態に保存
 
     // GeoJSONデータを使ってカスタムポイントを追加
     const customPoint: GeoJSON.FeatureCollection = {
@@ -40,20 +47,30 @@ export default function Home() {
           properties: {
             name: '琉大北口'
           }
+        },
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [127.76586765027561, 26.253177640375156] // 地域創生総合研究棟の座標
+          },
+          properties: {
+            name: '地域創生総合研究棟'
+          }
         }
       ]
     };
 
     // スタイルが読み込まれたときにカスタムレイヤーを追加
-    map.on('style.load', () => {
+    initMap.on('style.load', () => {
       // カスタムポイントのソースを追加
-      map.addSource('custom-point', {
+      initMap.addSource('custom-point', {
         type: 'geojson',
         data: customPoint
       });
 
       // ラベルを追加するレイヤー
-      map.addLayer({
+      initMap.addLayer({
         id: 'custom-point-layer',
         type: 'symbol',
         source: 'custom-point',
@@ -69,17 +86,30 @@ export default function Home() {
       });
     });
 
-    console.log(map); // mapオブジェクトの確認
-
     // コンポーネントがアンマウントされたときにマップを削除
-    return () => map.remove();
+    return () => initMap.remove();
   }, []);
 
   // ボタンクリック時のハンドラ
   const handleClick = () => {
-    const getMap = classInfoMap.get(textareaValue);
-    if (getMap) {
-      setRoomInfo(`${getMap}が講義室です。`); // 講義室情報を更新
+    const room = classInfoMap.get(textareaValue);
+    if (room) {
+      setRoomInfo(`${room.name}が講義室です。`); // 講義室情報を更新
+
+      // 既存のマーカーを削除
+      if (marker) {
+        marker.remove();
+      }
+
+      // 新しいマーカーを作成して追加
+      const newMarker = new mapboxgl.Marker()
+        .setLngLat(room.coordinates) // 座標を設定
+        .addTo(map); // マップに追加
+
+      setMarker(newMarker); // 新しいマーカーを状態に保存
+
+      // マップの中心をマーカーの位置に移動
+      map.flyTo({ center: room.coordinates, zoom: 16 });
     } else {
       setRoomInfo("講義室が見つかりませんでした。"); // 講義室が見つからなかった場合のメッセージ
     }
